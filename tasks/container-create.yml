@@ -1,0 +1,20 @@
+---
+# tasks file for ansible-podman container-create
+# Variables:
+# image_name (required): Image to create the container from.
+# named_volumes (optional): Volumes flag to include.
+# pod_name (optional): Pod to add the container to.
+# container_name (optional): Name to be given to the container
+
+- name: Create Container
+  command: "podman container create {{ '-v'+ named_volumes if named_volumes is defined else '' }} {{ '--pod ' + pod_name if pod_name is defined else '' }} {{ '--name ' + container_name if container_name is defined else '' }} {{ image_name }}"
+  become: yes
+  register: podman_container_create_res
+  changed_when: "podman_container_create_res.rc == 0"
+  failed_when: "podman_container_create_res.rc != 0 and ('file exists' not in podman_container_create_res.stderr)"
+
+- name: Fill podman_container_create
+  set_fact:
+    podman_container_create: "{{ podman_container_create_res.stdout }}"
+
+...

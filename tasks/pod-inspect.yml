@@ -1,0 +1,17 @@
+---
+# tasks file for ansible-podman
+# Variables:
+# pod_name (required): Pod to inspect
+
+- name: Inspect pod
+  command: "podman pod inspect {{ pod_name }}"
+  become: yes
+  register: podman_pod_inspect_res
+  changed_when: "False"
+  failed_when: "podman_pod_inspect_res.stdout is undefined"
+
+- name: Fill podman_pod_inspect
+  set_fact:
+    podman_pod_inspect: "{{ podman_pod_inspect_res.stdout }}"
+
+...

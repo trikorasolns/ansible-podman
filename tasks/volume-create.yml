@@ -1,0 +1,17 @@
+---
+# tasks file for ansible-podman
+# Variables:
+# volume_name (required): Volume to create
+
+- name: Create podman volume
+  command: "podman volume create {{ volume_name }}"
+  become: yes
+  register: podman_volume_create_res
+  changed_when: "podman_volume_create_res.rc == 0"
+  failed_when: "podman_volume_create_res.rc != 0 and ('file exists' not in podman_volume_create_res.stderr)"
+
+- name: Fill podman_volume_create
+  set_fact:
+    podman_volume_create: "{{ podman_volume_create_res.stdout }}"
+
+...
