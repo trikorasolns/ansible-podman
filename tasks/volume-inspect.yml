@@ -8,7 +8,7 @@
   become: yes
   register: podman_volume_inspect_res
   changed_when: "False"
-  failed_when: "{{ podman_volume_inspect_res.stdout is undefined }}"
+  failed_when: "podman_volume_inspect_res.stdout is undefined"
 
 - name: Fill podman_volume_inspect
   set_fact:
