@@ -1,0 +1,14 @@
+---
+# tasks file for ansible-podman
+- name: Check if the pod already exist
+  command: "podman pod exists {{ pod_name }}"
+  become: yes
+  register: podman_pod_exists_res
+  changed_when: "False"
+  failed_when: "False"
+
+- name: Fill exists
+  set_fact:
+    podman_pod_exists: "{{ podman_pod_exists_res.rc == 0 }}"
+
+...
