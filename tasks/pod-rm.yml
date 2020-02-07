@@ -2,7 +2,7 @@
 # tasks file for ansible-podman
 
 - name: Remove pod, if requested, and if exists
-  command: "podman pod rm {{ '-f' if (force is defined and force) }} {{ pod_name }}"
+  command: "podman pod rm {{ '-f' if (force is defined and force) else '' }} {{ pod_name }}"
   become: yes
   register: podman_pod_rm_res
   changed_when: "{{ podman_pod_rm_res.rc == 0 }}"

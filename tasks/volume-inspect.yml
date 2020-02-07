@@ -1,0 +1,17 @@
+---
+# tasks file for ansible-podman
+# Variables:
+# volume_name (required): Volume to inspect
+
+- name: Remove pod, if requested, and if exists
+  command: "podman pod inspect {{ volume_name }}"
+  become: yes
+  register: podman_volume_inspect_res
+  changed_when: "False"
+  failed_when: "{{ podman_volume_inspect_res.stdout is undefined }}"
+
+- name: Fill podman_volume_inspect
+  set_fact:
+    podman_volume_inspect: "{{ podman_volume_inspect_res.stdout }}"
+
+...
