@@ -3,8 +3,8 @@
 # Variables:
 # volume_name (required): Volume to inspect
 
-- name: Remove pod, if requested, and if exists
-  command: "podman pod inspect {{ volume_name }}"
+- name: Inspect volume
+  command: "podman volume inspect {{ volume_name }}"
   become: yes
   register: podman_volume_inspect_res
   changed_when: "False"
