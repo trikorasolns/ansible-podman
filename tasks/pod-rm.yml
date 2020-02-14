@@ -1,7 +1,7 @@
 ---
 # tasks file for ansible-podman
 
-- name: Remove pod, if requested, and if exists
+- name: Remove pod
   command: "podman pod rm {{ '-f' if (force is defined and force) else '' }} {{ pod_name }}"
   become: yes
   register: podman_pod_rm_res

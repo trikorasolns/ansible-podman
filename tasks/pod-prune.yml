@@ -1,7 +1,7 @@
 ---
 # tasks file for ansible-podman
 
-- name: Prune volumes
+- name: Prune pods
   command: "podman pod rm {{ '-f' if (force is defined and force) else ''}}"
   become: yes
   register: podman_volume_rm_res
