@@ -7,6 +7,10 @@
   changed_when: "False"
   failed_when: "False"
 
+- name: TODO REMOVE DEBUG Debug podman_container_exists_res
+  debug:
+    msg: "podman_container_exists_res: {{ podman_container_exists_res }}"
+
 - name: Fill exists
   set_fact:
     podman_container_exists: "{{ podman_container_exists_res.rc == 0 }}"

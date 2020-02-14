@@ -5,13 +5,35 @@
 # named_volumes (optional): Volumes flag to include.
 # pod_name (optional): Pod to add the container to.
 # container_name (optional): Name to be given to the container
+# port_map (list), (optional)
+
+#  {{ '--publish ' if ansible_loop.first else '' }}
+- name: Set ports to publish
+  set_fact:
+    port_map_str: "{{ item }} {{ '' if ansible_loop.last else ',' }}"
+  loop: "{{ port_map }}"
+  loop_control:
+    extended: yes
+  when: port_map is defined
+
+- name: Set volume definition
+  set_fact:
+    volume_str: "{{ item.volume_name }}:{{ item.target }}{{ ':z' if selinx_enabled else '' }}{{ '' if ansible_loop.last else ',' }}"
+  loop: "{{ named_volumes }}"
+  loop_control:
+    extended: yes
+  when: named_volumes is defined
 
 - name: Create Container
-  command: "podman container create {{ '-v'+ named_volumes if named_volumes is defined else '' }} {{ '--pod ' + pod_name if pod_name is defined else '' }} {{ '--name ' + container_name if container_name is defined else '' }} {{ image_name }}"
+  command: "podman create {{ '--publish '+ port_map_str if port_map_str is defined else '' }} {{ '-v '+ volume_str if volume_str is defined else '' }} {{ '--pod ' + pod_name if pod_name is defined else '' }} {{ '--name ' + container_name if container_name is defined else '' }} {{ image_name }}"
   become: yes
   register: podman_container_create_res
-  changed_when: "podman_container_create_res.rc == 0"
-  failed_when: "podman_container_create_res.rc != 0 and ('file exists' not in podman_container_create_res.stderr)"
+  changed_when: "podman_container_create_res.rc == 0 "
+  failed_when: "podman_container_create_res.rc != 0 and ('is already in use' not in podman_container_create_res.stderr)"
+
+- name: Debug podman_container_create_res
+  debug:
+    msg: "podman_container_create_res: {{ podman_container_create_res }}"
 
 - name: Fill podman_container_create
   set_fact:

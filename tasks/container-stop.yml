@@ -1,0 +1,17 @@
+---
+# tasks file for ansible-podman container-create
+# Variables:
+# container_name: Name to be given to the container
+
+- name: Stop Container
+  command: "podman stop {{ container_name }}"
+  become: yes
+  register: podman_container_stop_res
+  changed_when: "podman_container_stop_res.rc == 0 "
+  failed_when: "podman_container_stop_res.rc != 0 "
+
+- name: Fill podman_container_stop output
+  set_fact:
+    podman_container_stop: "{{ podman_container_stop_res.stdout }}"
+
+...

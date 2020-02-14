@@ -1,0 +1,18 @@
+---
+# tasks file for ansible-podman
+- name: Check if the container is started
+  command: "podman container list --filter name={{ container_name }}"
+  become: yes
+  register: podman_container_started_res
+  changed_when: "False"
+  failed_when: "False"
+
+- name: TODO REMOVE DEBUG Debug podman_container_started_res
+  debug:
+    msg: "podman_container_started_res: {{ podman_container_started_res }}"
+
+- name: Fill podman_container_started
+  set_fact:
+    podman_container_started: "{{ podman_container_started_res.stdout_lines | length > 1 }}"
+
+...
