@@ -6,6 +6,7 @@
 # pod_name (optional): Pod to add the container to.
 # container_name (optional): Name to be given to the container
 # port_map (list), (optional)
+# env_vars (optional): Environment variables to pass to container
 
 #  {{ '--publish ' if ansible_loop.first else '' }}
 - name: Set ports to publish
@@ -16,16 +17,24 @@
     extended: yes
   when: port_map is defined
 
+- name: Set environment variables
+  set_fact:
+    env_vars_str: "{{ item }} {{ '' if ansible_loop.last else ' ' }}"
+  loop: "{{ env_vars }}"
+  loop_control:
+    extended: yes
+  when: env_vars is defined
+
 - name: Set volume definition
   set_fact:
-    volume_str: "{{ item.volume_name }}:{{ item.target }}{{ ':z' if selinx_enabled else '' }}{{ '' if ansible_loop.last else ',' }}"
+    volume_str: "{{ item.volume_name }}:{{ item.target }}{{ ':z' if (selinux_enabled is defined and selinux_enabled) else '' }}{{ '' if ansible_loop.last else ',' }}"
   loop: "{{ named_volumes }}"
   loop_control:
     extended: yes
   when: named_volumes is defined
 
 - name: Create Container
-  command: "podman create {{ '--publish '+ port_map_str if port_map_str is defined else '' }} {{ '-v '+ volume_str if volume_str is defined else '' }} {{ '--pod ' + pod_name if pod_name is defined else '' }} {{ '--name ' + container_name if container_name is defined else '' }} {{ image_name }}"
+  command: "podman create {{ '--env ' + env_vars_str if env_vars_str is defined else '' }} {{ '--publish '+ port_map_str if port_map_str is defined else '' }} {{ '-v '+ volume_str if volume_str is defined else '' }} {{ '--pod ' + pod_name if pod_name is defined else '' }} {{ '--name ' + container_name if container_name is defined else '' }} {{ image_name }}"
   become: yes
   register: podman_container_create_res
   changed_when: "podman_container_create_res.rc == 0 "
